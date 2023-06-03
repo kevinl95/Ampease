@@ -1,0 +1,23 @@
+[DEFAULT]
+# Acceptable values are sandbox or production
+environment =
+tplink_email = tplink_email
+tplink_password = tplink_password
+# Must match the name of your device in the TPLink Kasa app
+tplink_device_alias = tplink_device_alias
+# Acceptable ammounts are greater than $1 and are in USD. Input must be an integer (e.g. 100 is $1, 150 is $1.50, etc.)
+cost_per_hour = cost_per_hour
+# Expected voltage as an integer (e.g. 120 in the USA)
+expected_voltage = expected_voltage
+# How many hours until the charger turns off automatically. Must be less than or equal to 24.
+timeout = timeout
+
+[PRODUCTION]
+square_application_id = production_application_id
+square_access_token = production_access_token
+square_location_id = production_location_id
+
+[SANDBOX]
+square_application_id = sandbox_application_id
+square_access_token = sandbox_access_token
+square_location_id = sandbox_location_id

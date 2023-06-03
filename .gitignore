@@ -3,8 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Credentials
+*.ini
+
 # C extensions
 *.so
+
+# Configuration files
+*.ini
 
 # Distribution / packaging
 .Python
