@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>QR Code</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- link to the custom styles for Web SDK -->
+    <link rel='stylesheet', href='/static/stylesheets/sq-payment.css' />
+    <link rel='stylesheet', href='/static/stylesheets/style.css' />
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    </head>
+
+    <body>
+    <img src="/static/assets/logo.png" alt="AmpEase Logo"> 
+    <div id="qrcode"></div>
+    <script type="text/javascript">
+    new QRCode(document.getElementById("qrcode"), window.location.origin);
+    </script>
+    </body>
+
+</html>

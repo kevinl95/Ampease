@@ -1,11 +1,11 @@
 .payment-form {
-  padding: 50px 0px 50px 0px;
+  padding: 1px 0px 1px 0px;
   width: 100%;
   max-width: 1000px;
-  margin: 40px auto;
+  margin: 10px auto;
   display: flex;
   justify-content: center;
-  border-radius: 20px;
+  border-radius: 15px;
 }
 
 .payment-form {
@@ -16,14 +16,14 @@
   .payment-form {
     border-radius: 0;
     margin: 0;
-    height: 110vh;
+    height: 50vh;
     max-width: 100%;
   }
 }
 
 @media (max-width: 600px) {
   .payment-form {
-    padding: 30px;
+    padding: 0px;
     box-sizing: border-box;
   }
 }
@@ -38,7 +38,7 @@
 }
 
 #fast-checkout {
-  background: #fafafa;
+  background: #8dafc4;
   color: black;
 }
 

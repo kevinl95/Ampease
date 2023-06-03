@@ -7,9 +7,12 @@ import sys
 import asyncio
 import json
 import requests
+import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from flask import request
 from tplinkcloud import TPLinkDeviceManager
 from pydantic import BaseModel
@@ -50,10 +53,6 @@ if not EXPECTED_VOLTAGE.isdigit():
     sys.exit("Expected voltage must be an integer!")
 
 
-# Status globals
-active = False
-
-
 client = Client(
     access_token=ACCESS_TOKEN,
     environment=config.get("DEFAULT", "environment"),
@@ -64,19 +63,22 @@ location = client.locations.retrieve_location(location_id=LOCATION_ID).body["loc
 ACCOUNT_CURRENCY = location["currency"]
 ACCOUNT_COUNTRY = location["country"]
 
+
 async def get_device_location():
-  devices = await device_manager.get_devices()
-  lat = 0
-  lon = 0
-  for device in devices:
-    async def get_info(device):
-      data = await device.get_sys_info()
-      lat = data["latitude_i"] / 10000
-      lon = data["longitude_i"] / 10000
-      return (lat, lon)
-    if device.get_alias() == TPLINK_DEVICE_ALIAS:
-        lat, lon = await get_info(device)
-  return (lat, lon)
+    devices = await device_manager.get_devices()
+    lat = 0
+    lon = 0
+    for device in devices:
+
+        async def get_info(device):
+            data = await device.get_sys_info()
+            lat = data["latitude_i"] / 10000
+            lon = data["longitude_i"] / 10000
+            return (lat, lon)
+
+        if device.get_alias() == TPLINK_DEVICE_ALIAS:
+            lat, lon = await get_info(device)
+    return (lat, lon)
 
 
 async def toggle_charger():
@@ -88,7 +90,50 @@ async def toggle_charger():
     await asyncio.gather(*fetch_tasks)
 
 
+def toggle_helper():
+    asyncio.run(toggle_charger())
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(toggle_helper, "interval", hours=int(TIMEOUT))
+
+
+def schedule_toggle():
+    global sched
+    asyncio.run(toggle_charger())
+    sched.shutdown()
+
+
 def geofence():
+    html_content = """<!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>AmpEase</title>
+        <link rel="manifest" href="/static/manifest.json">
+        <link rel="icon" type="image/x-icon" href="/static/assets/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- link to the custom styles for Web SDK -->
+        <link rel='stylesheet', href='/static/stylesheets/sq-payment.css' />
+        <link rel='stylesheet', href='/static/stylesheets/style.css' />
+      </head>
+
+      <body>
+        <img src="/static/assets/logo.png" alt="AmpEase Logo"> 
+        <p class="center">Welcome! You are currently too far away from this charging station. Move to within 100 feet to continue.</p>
+        </body>
+
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
+
+
+def activated():
+    global sched
+    nextTime = None
+    for job in sched.get_jobs():
+        nextTime = job.next_run_time
     html_content = (
         """<!DOCTYPE html>
     <html>
@@ -107,7 +152,16 @@ def geofence():
 
       <body>
         <img src="/static/assets/logo.png" alt="AmpEase Logo"> 
-        <p class="center">Welcome! You are currently too far away from this charging station. Move to within 100 feet to continue.</p>
+        <h1>Charger is currently activated!</h1>
+        <p class="center">Welcome! This is a level 1 EV charging station ("""
+        + EXPECTED_VOLTAGE
+        + """V) that has already been activated by paying a small fee to get started using the form below.</p>
+        <p class="center">Your host has specified that there is a charge of """
+        + dollarstr
+        + """ to use this charger.</p>
+        <p class="center">The charger will be active until """
+        + nextTime.strftime("%H:%M")
+        + """.</p>
         </body>
 
     </html>
@@ -163,9 +217,9 @@ def generate_index_html():
         <p class="center">Your host has specified that there is a charge of """
         + dollarstr
         + """ to use this charger.</p>
-        <p class="center">Important! Please turn off charging from this page after unplugging! After activation the charger will be on for """
+        <p class="center">Important! After activation the charger will be on for """
         + str(TIMEOUT)
-        + """ hours unless you turn it off.</p>
+        + """ hours.</p>
         <form class="payment-form" id="fast-checkout">
           <div class="wrapper">
             <div id="card-container"></div>
@@ -193,27 +247,35 @@ class Payment(BaseModel):
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
+    global sched
     clientIP = request.client.host
     if clientIP != "127.0.0.1":
-        url = 'http://ip-api.com/json/{}'.format(clientIP)
-        print(url)
+        url = "http://ip-api.com/json/{}".format(clientIP)
         r = requests.get(url)
         j = json.loads(r.text)
-        cliCoords = (j['lat'], j['lon'])
+        cliCoords = (j["lat"], j["lon"])
         coords = asyncio.run(get_device_location())
         distance = geopy.distance.geodesic(cliCoords, coords).km
         if distance > 0.03:
             return geofence()
+    if sched.running:
+        return activated()
     return generate_index_html()
+
+
+@app.get("/graphics", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse("graphics.html", {"request": request})
 
 
 @app.post("/process-payment")
 def create_payment(payment: Payment):
-    global active
+    global sched
     logging.info("Creating payment")
     # Charge the customer's card
     create_payment_response = client.payments.create_payment(
@@ -231,7 +293,7 @@ def create_payment(payment: Payment):
     if create_payment_response.is_success():
         # Turn on the charger
         asyncio.run(toggle_charger())
-        active = True
+        sched.start()
         return create_payment_response.body
     elif create_payment_response.is_error():
         return create_payment_response

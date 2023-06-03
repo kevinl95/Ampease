@@ -18,6 +18,7 @@ uvicorn = "^0.22.0"
 aiofiles = "^23.1.0"
 black = "^23.3.0"
 geopy = "^2.3.0"
+apscheduler = "^3.10.1"
 
 
 [build-system]
