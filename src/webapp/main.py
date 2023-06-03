@@ -93,6 +93,7 @@ async def toggle_charger():
 def toggle_helper():
     asyncio.run(toggle_charger())
 
+
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(toggle_helper, "interval", hours=int(TIMEOUT))
 
