@@ -9,6 +9,7 @@ import json
 import requests
 import os
 import datetime
+import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -412,3 +413,6 @@ def create_payment(payment: Payment):
         return create_payment_response.body
     elif create_payment_response.is_error():
         return create_payment_response
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
