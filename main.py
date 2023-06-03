@@ -15,6 +15,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from geopy.distance import geodesic as GD
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -171,7 +172,7 @@ def schedule_toggle():
     sched.shutdown()
 
 
-def geofence():
+def geofence(distance):
     html_content = """<!DOCTYPE html>
     <html>
       <head>
@@ -373,10 +374,10 @@ async def read_root(request: Request):
         r = requests.get(url)
         j = json.loads(r.text)
         cliCoords = (j["lat"], j["lon"])
-        coords = asyncio.run(get_device_location())
-        distance = geopy.distance.geodesic(cliCoords, coords).km
-        if distance > 0.03:
-            return geofence()
+        coords = await get_device_location()
+        distance = GD(cliCoords, coords).km
+        if distance > 100:
+            return geofence(distance)
     if sched.running:
         return activated()
     return generate_index_html()
@@ -413,6 +414,3 @@ def create_payment(payment: Payment):
         return create_payment_response.body
     elif create_payment_response.is_error():
         return create_payment_response
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
