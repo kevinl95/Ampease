@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Setup</title>
+    <link rel="icon" type="image/x-icon" href="/static/assets/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- link to the custom styles for Web SDK -->
+    <link rel='stylesheet', href='/static/stylesheets/sq-payment.css' />
+    <link rel='stylesheet', href='/static/stylesheets/style.css' />
+    </head>
+    <body>
+    <img src="/static/assets/logo.png" alt="AmpEase Logo"> 
+    <h1>AmpEase Setup</h1>
+    <p class="center">Please populate this form with the following information. Help can be found in our how-to guide.</p>
+    <form method="POST" action="/">
+        {{ form.app_id.label }} {{ form.app_id(size=20) }}
+        {{ form.loc_id.label }} {{ form.loc_id(size=20) }}
+        {{ form.access_token.label }} {{ form.access_token(size=20) }}
+        {{ form.tplink_email.label }} {{ form.tplink_email(size=20) }}
+        {{ form.tplink_password.label }} {{ form.tplink_password(size=20) }}
+        {{ form.tplink_device_alias.label }} {{ form.tplink_device_alias(size=20) }}
+        {{ form.cost.label }} {{ form.cost(size=20) }}
+        {{ form.timeout.label }} {{ form.timeout(size=20) }}
+        {{ form.expected_voltage.label }} {{ form.expected_voltage(size=20) }}
+        <p> {{ form.submit }}</p>
+    </form>
+    {% if form.app_id.errors %}
+    <ul class="errors">
+        {% for error in form.app_id.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.loc_id.errors %}
+    <ul class="errors">
+        {% for error in form.loc_id.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.access_token.errors %}
+    <ul class="errors">
+        {% for error in form.access_token.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.tplink_email.errors %}
+    <ul class="errors">
+        {% for error in form.tplink_email.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.tplink_password.errors %}
+    <ul class="errors">
+        {% for error in form.tplink_password.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.tplink_device_alias.errors %}
+    <ul class="errors">
+        {% for error in form.tplink_device_alias.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.cost.errors %}
+    <ul class="errors">
+        {% for error in form.cost.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.timeout.errors %}
+    <ul class="errors">
+        {% for error in form.timeout.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if form.expected_voltage.errors %}
+    <ul class="errors">
+        {% for error in form.expected_voltage.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    </body>
+
+</html>

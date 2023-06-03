@@ -1211,6 +1211,21 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-multipart"
+version = "0.0.6"
+description = "A streaming multipart parser for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "python_multipart-0.0.6-py3-none-any.whl", hash = "sha256:ee698bab5ef148b0a760751c261902cd096e57e10558e11aca17646b74ee1c18"},
+    {file = "python_multipart-0.0.6.tar.gz", hash = "sha256:e9925a80bb668529f1b67c7fdb0a5dacdd7cbfc6fb0bff3ea443fe22bdd62132"},
+]
+
+[package.extras]
+dev = ["atomicwrites (==1.2.1)", "attrs (==19.2.0)", "coverage (==6.5.0)", "hatch", "invoke (==1.7.3)", "more-itertools (==4.3.0)", "pbr (==4.3.0)", "pluggy (==1.0.0)", "py (==1.11.0)", "pytest (==7.2.0)", "pytest-cov (==4.0.0)", "pytest-timeout (==2.1.0)", "pyyaml (==5.1)"]
+
+[[package]]
 name = "pytz"
 version = "2023.3"
 description = "World timezone definitions, modern and historical"
@@ -1349,6 +1364,26 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "starlette-wtf"
+version = "0.4.3"
+description = "Simple integration of Starlette and WTForms."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "Starlette-WTF-0.4.3.tar.gz", hash = "sha256:4b01d670f65112f13d19aa458cc9932f94f17ace14aaae1b6f08224f4aab2d86"},
+]
+
+[package.dependencies]
+itsdangerous = "*"
+python-multipart = "*"
+starlette = "*"
+WTForms = "*"
+
+[package.extras]
+test = ["jinja2", "pytest", "requests"]
+
+[[package]]
 name = "tplink-cloud-api"
 version = "4.1.5"
 description = "Python library for communicating with the TP-Link Cloud API to manage TP-Link Kasa Smart Home devices"
@@ -1462,6 +1497,24 @@ MarkupSafe = ">=2.1.1"
 watchdog = ["watchdog (>=2.3)"]
 
 [[package]]
+name = "wtforms"
+version = "3.0.1"
+description = "Form validation and rendering for Python web development."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "WTForms-3.0.1-py3-none-any.whl", hash = "sha256:837f2f0e0ca79481b92884962b914eba4e72b7a2daaf1f939c890ed0124b834b"},
+    {file = "WTForms-3.0.1.tar.gz", hash = "sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc"},
+]
+
+[package.dependencies]
+MarkupSafe = "*"
+
+[package.extras]
+email = ["email-validator"]
+
+[[package]]
 name = "yarl"
 version = "1.9.2"
 description = "Yet another URL library"
@@ -1552,4 +1605,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "63fbb44448f541983dd4ec7a21ca7eb6862f114e54dfdbb066effcc0182c3b31"
+content-hash = "28074976f62a7eee180a3ce82dfd43bf7d8d0b88c77c712be77841cd1de72ce2"
