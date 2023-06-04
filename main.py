@@ -424,10 +424,13 @@ async def read_root(request: Request):
         r = requests.get(url)
         j = json.loads(r.text)
         cliCoords = (j["lat"], j["lon"])
-        coords = await get_device_location()
-        distance = GD(cliCoords, coords).km
-        if distance > 100:
-            return geofence(distance)
+        try:
+            coords = await get_device_location()
+            distance = GD(cliCoords, coords).km
+            if distance > 100:
+                return geofence(distance)
+        except TypeError as e:
+            pass
     if sched.running:
         return activated()
     return generate_index_html()
