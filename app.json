@@ -1,8 +1,0 @@
-{
-    "name": "AmpEase",
-    "description": "Deploy a Level 1 EV charging station for under $50",
-    "repository": "https://github.com/kevinl95/Ampease",
-    "logo": "https://raw.githubusercontent.com/kevinl95/Ampease/main/static/assets/logo.png",
-    "keywords": ["python", "energy", "flask", "square"]
-  }
-  
