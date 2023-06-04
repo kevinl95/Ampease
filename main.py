@@ -50,16 +50,28 @@ location = None
 ACCOUNT_CURRENCY = None
 ACCOUNT_COUNTRY = None
 
+
 class SetupForm(StarletteForm):
-    app_id = StringField('Square Production Application ID', validators=[DataRequired()])
-    loc_id = StringField('Square Production Location ID', validators=[DataRequired()])
-    access_token = StringField('Square Production Access Token', validators=[DataRequired()])
-    tplink_email = EmailField('TPLink Email Address', validators=[DataRequired()])
-    tplink_password = PasswordField('TPLink Password', validators=[DataRequired()])
-    tplink_device_alias = StringField('TPLink Device Alias', validators=[DataRequired()])
-    cost = IntegerField('Cost Per Charge (in cents, e.g. 100 is $1.00)', validators=[DataRequired()])
-    timeout = IntegerField('Charge duration in hours', validators=[DataRequired()])
-    expected_voltage = IntegerField('Expected Voltage (e.g. in the USA this should be 120)', validators=[DataRequired()])
+    app_id = StringField(
+        "Square Production Application ID", validators=[DataRequired()]
+    )
+    loc_id = StringField("Square Production Location ID", validators=[DataRequired()])
+    access_token = StringField(
+        "Square Production Access Token", validators=[DataRequired()]
+    )
+    tplink_email = EmailField("TPLink Email Address", validators=[DataRequired()])
+    tplink_password = PasswordField("TPLink Password", validators=[DataRequired()])
+    tplink_device_alias = StringField(
+        "TPLink Device Alias", validators=[DataRequired()]
+    )
+    cost = IntegerField(
+        "Cost Per Charge (in cents, e.g. 100 is $1.00)", validators=[DataRequired()]
+    )
+    timeout = IntegerField("Charge duration in hours", validators=[DataRequired()])
+    expected_voltage = IntegerField(
+        "Expected Voltage (e.g. in the USA this should be 120)",
+        validators=[DataRequired()],
+    )
     submit = SubmitField(label="Submit")
 
 
@@ -93,17 +105,16 @@ async def keep_state():
         for device in devices:
             if device.get_alias() == TPLINK_DEVICE_ALIAS:
                 on = await device.is_on()
-                print(on)
                 if on and chargerOn == False:
                     await device.power_off()
                 if on == False and chargerOn:
                     await device.power_on()
         await asyncio.gather(*fetch_tasks)
 
+
 def state_helper():
-    print('running state helper')
     asyncio.run(keep_state())
-        
+
 
 state_keeper = BackgroundScheduler(daemon=True)
 state_keeper.add_job(state_helper, "interval", seconds=30)
@@ -176,6 +187,7 @@ def setupApp():
     ACCOUNT_COUNTRY = location["country"]
     sched = BackgroundScheduler(daemon=True)
     sched.add_job(toggle_helper, "interval", hours=int(TIMEOUT))
+
 
 try:
     setupApp()
@@ -388,24 +400,26 @@ async def read_root(request: Request):
     timeout = setupForm.timeout.data
     expected_voltage = setupForm.expected_voltage.data
     if await setupForm.validate_on_submit() and not configPresent:
-        with open('config.ini', 'w') as f:
-            f.write('[DEFAULT]\n')
-            f.write('environment = production\n')
-            f.write('tplink_email = ' + tplink_email + "\n")
-            f.write('tplink_password = ' + tplink_password + "\n")
-            f.write('tplink_device_alias = ' + tplink_device_alias + "\n")
-            f.write('cost_per_charge = ' + str(cost) + "\n")
-            f.write('timeout = ' + str(timeout) + "\n")
-            f.write('expected_voltage = ' + str(expected_voltage) + "\n")
-            f.write('\n')
-            f.write('[PRODUCTION] \n')
-            f.write('square_application_id = ' + app_id + "\n")
-            f.write('square_access_token = ' + access_token + "\n")
-            f.write('square_location_id = ' + loc_id + "\n")
+        with open("config.ini", "w") as f:
+            f.write("[DEFAULT]\n")
+            f.write("environment = production\n")
+            f.write("tplink_email = " + tplink_email + "\n")
+            f.write("tplink_password = " + tplink_password + "\n")
+            f.write("tplink_device_alias = " + tplink_device_alias + "\n")
+            f.write("cost_per_charge = " + str(cost) + "\n")
+            f.write("timeout = " + str(timeout) + "\n")
+            f.write("expected_voltage = " + str(expected_voltage) + "\n")
+            f.write("\n")
+            f.write("[PRODUCTION] \n")
+            f.write("square_application_id = " + app_id + "\n")
+            f.write("square_access_token = " + access_token + "\n")
+            f.write("square_location_id = " + loc_id + "\n")
         configPresent = True
         setupApp()
     if not configPresent:
-        return templates.TemplateResponse("setup.html", {"request": request, "form": setupForm})
+        return templates.TemplateResponse(
+            "setup.html", {"request": request, "form": setupForm}
+        )
     if clientIP != "127.0.0.1":
         url = "http://ip-api.com/json/{}".format(clientIP)
         r = requests.get(url)
