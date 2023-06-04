@@ -205,7 +205,6 @@ async def get_device_location():
 
         async def get_info(device):
             data = await device.get_sys_info()
-            print(data)
             lat = data["latitude_i"] / 10000
             lon = data["longitude_i"] / 10000
             return (lat, lon)
@@ -425,11 +424,8 @@ async def read_root(request: Request):
         r = requests.get(url)
         j = json.loads(r.text)
         cliCoords = (j["lat"], j["lon"])
-        print(cliCoords)
         coords = await get_device_location()
-        print(coords)
         distance = GD(cliCoords, coords).km
-        print(distance)
         if distance > 100:
             return geofence(distance)
     if sched.running:
