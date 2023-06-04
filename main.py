@@ -433,7 +433,7 @@ async def read_root(request: Request):
             pass
     if sched.running:
         return activated()
-    return generate_index_html()
+    return geofence(0)
 
 
 @app.get("/graphics", response_class=HTMLResponse)
