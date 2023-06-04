@@ -416,7 +416,7 @@ async def read_root(request: Request):
             f.write("square_location_id = " + loc_id + "\n")
         configPresent = True
         setupApp()
-    if not configPresent:
+    elif not configPresent:
         return templates.TemplateResponse(
             "setup.html", {"request": request, "form": setupForm}
         )
