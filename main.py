@@ -76,6 +76,11 @@ def toggle_helper():
 
 
 def setupApp():
+    # To read your secret credentials
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+
+    # Set up gloabls
     global sched
     global CONFIG_TYPE
     global PAYMENT_FORM_URL
@@ -95,9 +100,6 @@ def setupApp():
     global location
     global ACCOUNT_CURRENCY
     global ACCOUNT_COUNTRY
-    # To read your secret credentials
-    config = configparser.ConfigParser()
-    config.read("config.ini")
 
     # Retrieve credentials based on is_prod
     CONFIG_TYPE = config.get("DEFAULT", "environment").upper()
@@ -127,15 +129,14 @@ def setupApp():
     EXPECTED_VOLTAGE = config.get("DEFAULT", "expected_voltage")
     if not EXPECTED_VOLTAGE.isdigit():
         sys.exit("Expected voltage must be an integer!")
-
-
     client = Client(
         access_token=ACCESS_TOKEN,
         environment=config.get("DEFAULT", "environment"),
-        user_agent_detail="ampease_payment",  # Remove or replace this detail when building your own app
+        user_agent_detail="ampease-payment",
     )
 
-    location = client.locations.retrieve_location(location_id=LOCATION_ID).body["location"]
+    locReq = client.locations.retrieve_location(location_id=LOCATION_ID)
+    location = locReq.body["location"]
     ACCOUNT_CURRENCY = location["currency"]
     ACCOUNT_COUNTRY = location["country"]
     sched = BackgroundScheduler(daemon=True)
