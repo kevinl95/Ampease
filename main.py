@@ -28,6 +28,8 @@ from pydantic import BaseModel
 
 from square.client import Client
 
+chargerOn = False
+
 CONFIG_TYPE = None
 PAYMENT_FORM_URL = None
 configPresent = True
@@ -63,16 +65,49 @@ class SetupForm(StarletteForm):
 
 async def toggle_charger():
     global TPLINK_DEVICE_ALIAS
+    global device_manager
+    global chargerOn
     devices = await device_manager.get_devices()
     fetch_tasks = []
     for device in devices:
         if device.get_alias() == TPLINK_DEVICE_ALIAS:
             await device.toggle()
+            if chargerOn:
+                chargerOn = False
+            else:
+                chargerOn = True
     await asyncio.gather(*fetch_tasks)
 
 
 def toggle_helper():
     asyncio.run(toggle_charger())
+
+
+async def keep_state():
+    global TPLINK_DEVICE_ALIAS
+    global device_manager
+    global chargerOn
+    if TPLINK_DEVICE_ALIAS and device_manager:
+        devices = await device_manager.get_devices()
+        fetch_tasks = []
+        for device in devices:
+            if device.get_alias() == TPLINK_DEVICE_ALIAS:
+                on = await device.is_on()
+                print(on)
+                if on and chargerOn == False:
+                    await device.power_off()
+                if on == False and chargerOn:
+                    await device.power_on()
+        await asyncio.gather(*fetch_tasks)
+
+def state_helper():
+    print('running state helper')
+    asyncio.run(keep_state())
+        
+
+state_keeper = BackgroundScheduler(daemon=True)
+state_keeper.add_job(state_helper, "interval", seconds=30)
+state_keeper.start()
 
 
 def setupApp():
