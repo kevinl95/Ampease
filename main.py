@@ -427,7 +427,7 @@ async def read_root(request: Request):
         try:
             coords = await get_device_location()
             distance = GD(cliCoords, coords).km
-            if distance > 5000:
+            if distance > 100:
                 return geofence(distance)
         except TypeError as e:
             pass
